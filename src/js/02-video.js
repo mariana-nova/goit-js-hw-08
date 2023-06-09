@@ -1,17 +1,18 @@
 import Vimeo from '@vimeo/player';
-import { throttle } from 'lodash';
+import _ from 'lodash';
 
- const iframe = document.querySelector('iframe');
- const breeder = new Vimeo(iframe); 
+ const breeder = new Vimeo(document.querySelector('#vimeo-player'));
 
- const localstore = async () =>{ 
+
+ const localstore =  () =>{ 
  try { 
- const time_Seconds = await breeder.getCurrentTime();  
- localStorage.setItem('current-time', time_Seconds);
+ breeder.getCurrentTime().then(seconds => {
+ localStorage.setItem('videoplayer-current-time', seconds);
+ });
  } catch (error) { 
  console.error('Error al obtener el tiempo actual de reproduccion', error);
  }
 };
- breeder.on('play', throttle(localstore, 1000)); 
- const current_Time = localStorage.getItem('current-time');
- current_Time ? breeder.setCurrentTime(current_Time) : null;
+ breeder.on('timeupdate', _.throttle(localstore, 1000)); 
+ const currentTime = localStorage.getItem('videoplayer-current-time');
+ currentTime ? breeder.setCurrentTime(currentTime) : null;
